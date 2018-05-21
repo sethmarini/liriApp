@@ -1,47 +1,54 @@
 require("dotenv").config();
 
-var fs = require("fs");
-var request = require("request");
- 
-var Twitter = require("twitter");
-var Spotify = require('node-spotify-api');
-
-// Client ID: 1e0997f6e58842c5b1db5f462d7e8299
-// Client Secret: 34d1ef11b18d49c5a3ccf340bf0d56bc
-// key: c74ac23b
-var keys = require("./keys.js");
-var spotify = new Spotify(keys.spotify);
-var client = new Twitter(keys.twitter);
+var fs      = require("fs"),
+	request = require("request"),
+	Twitter = require("twitter"),
+ 	Spotify = require('node-spotify-api'),
+  	keys    = require("./keys.js"),
+ 	spotify = new Spotify(keys.spotify),
+ 	client  = new Twitter(keys.twitter);
 
 // twitter
-var myTweets = function() {
-	var params = {screen_name: 'sethmarini'};
-	client.get('statuses/user_timeline', params, function(error, tweets, response) {
-  	if (!error) {
-    console.log(tweets);
-  }
-	console.log("It works!");
+
+var myTweets = function(tweet) {
+	client.get('search/tweets', {q: tweet, count: 20}, function(error, data, response) {
+		if(!error) {
+			for(var i = 0; i < 20; i++) {
+				console.log("Tweet: " + i);
+				console.log("Created: " + tweets.statuses[i].created_at);
+				console.log("Text: " + tweets.statuses[i].text);
+			}
+		}
+	});
 }
 
 // spotify
-var spotifyThisSong = function(arr) {
-
-	if (!arr) {
-		arr = "The Sign";
-	}
-
-	console.log("Song: " + arr);
+var spotifyThisSong = function(song) {
+	spotify.search({ type: 'track', query: song, limit: 1}, function(err, data) {
+		if(err) {
+			return console.log("Sorry cannot find song");
+		}
+		console.log("Artist: " + data.tracks.items[0].album.artists[0].name);
+		console.log("Song: " + data.tracks.items[0].album.external_urls.spotify);
+		console.log("Album: " + data.tracks.items[0].album.name);
+	});
 }
 
 // imdb
-var movieThis = function(arr) {
+var movieThis = function(movie) {
+	var movie = JSON.parse(body);
+	var queryUrl = "http://www.omdbapi.com/?t=" + movie + "&y=&plot=short&apikey=trilogy";
+	request(queryUrl, function(err, response, body) {
+		console.log("Movie: " + movie.Title);
+		console.log("Plot: " + movie.Plot);
+		console.log("Year: " + movie.Year);
+		console.log("Actors: " + movie.Actors);
+		console.log("Rating: " + movie.imdbRating);
+		console.log("Language: " + movie.Language);
+		console.log("Rotten Tomates: " + movie.movie.Ratings[1].Value);
+	});
+};
 
-	if (!arr) {
-		arr = "Pulp Fiction";
-	}
-
-	console.log("Movie: " + arr);
-}
 
 // text file
 var doWhatItSays = function() {
@@ -74,9 +81,9 @@ var doWhatItSays = function() {
 	})
 }
 
-var liri = function() {
+var liri = function(command, title) {
 
-		var command = process.argv[2]; 
+		var command = process.argv[2];
 		var title = process.argv[3];
 		console.log(command);
 		switch (command) {
@@ -98,7 +105,3 @@ var liri = function() {
 };
 
 liri();
-
-
-
-
