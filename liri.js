@@ -9,7 +9,6 @@
 	 	client  = new Twitter(keys.twitter);
 
 	// twitter
-
 	var myTweets = function(tweet) {
 		console.log("this works!");
 		var params = {screen_name: 'sethmarini'};
@@ -82,6 +81,7 @@
 		})
 	}
 
+	// main function
 	var liri = function(command, title) {
 
 			var command = process.argv[2],
